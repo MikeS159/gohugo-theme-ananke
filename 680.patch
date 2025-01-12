@@ -1,0 +1,29 @@
+From 29f50b65a37bc7ecfac9f4ad3423af2899a98ff4 Mon Sep 17 00:00:00 2001
+From: Andreas Deininger <andreas@deininger.net>
+Date: Sun, 24 Mar 2024 21:14:46 +0100
+Subject: [PATCH] Fix deprecation warning for .Site.Social param (hugo 0.124)
+
+---
+ layouts/partials/social-share.html | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/layouts/partials/social-share.html b/layouts/partials/social-share.html
+index 14ae03370..43ad9c584 100644
+--- a/layouts/partials/social-share.html
++++ b/layouts/partials/social-share.html
+@@ -3,8 +3,13 @@
+ 
+ {{ $facebook_href := printf "https://www.facebook.com/sharer.php?u=%s" $url }}
+ {{ $twitter_href := printf "https://twitter.com/intent/tweet?url=%s&text=%s" $url $title }}
+-{{ with site.Social.twitter }}
+-  {{ $twitter_href = printf "%s&via=%s" $twitter_href . }}
++{{/* Looking for twitter in the registered services */}}
++{{ with site.Params.ananke_socials }}
++  {{ range $service := . }}
++    {{ if eq .name "twitter" }}
++      {{ $twitter_href = printf "%s&via=%s" $twitter_href . }}
++    {{ end }}
++  {{ end }}
+ {{ end }}
+ {{ $linkedin_href := printf "https://www.linkedin.com/shareArticle?mini=true&url=%s&title=%s" $url $title }}
+ {{ $hrefs := dict "facebook" $facebook_href "twitter" $twitter_href "linkedin" $linkedin_href }}
